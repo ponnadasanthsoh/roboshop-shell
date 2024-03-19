@@ -5,7 +5,6 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
-MONGODB_HOST=mongodb.pkljs.tech
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
@@ -30,71 +29,26 @@ else
     echo "You are root user"
 fi # fi means reverse of if, indicating condition end
 
-dnf module disable nodejs -y
+cp mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
 
-VALIDATE $? "Disablling nodejs" 
+VALIDATE $? "Copied MongDB repo" &>> $LOGFILE
 
-dnf module enable nodejs:18 -y &>> $LOGFILE
+dnf install mongodb-org -y  &>> $LOGFILE
 
-VALIDATE $? "Enable nodejs 18" 
+VALIDATE $? "Installing mongodb" &>> $LOGFILE
 
-dnf install nodejs -y &>> $LOGFILE
+systemctl enable mongod  &>> $LOGFILE
 
-VALIDATE $? "Installing nodejs 18"
-id roboshop
-if [ $? -ne 0 ]
-then
-   useradd roboshop
-   VALIDATE $? "Roboshop user creation"
-else
-   echo -e "roboshop iser already exits $Y SKIPPING $N"
-fi
+VALIDATE $? "Enabling mongodb" &>> $LOGFILE
 
-mkdir -p /app
+systemctl start mongod &>> $LOGFILE
 
-VALIDATE $? "Creating app directory"
+VALIDATE $? "Starting mongodb" &>> $LOGFILE
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>> $LOGFILE
+sed -i 's/127.0.0.1/0.0.0.0/g'  /etc/mongod.conf &>> $LOGFILE
 
-VALIDATE $? "Downloading catalogue"
+VALIDATE $? "Remort access to mongodb mongodb"
 
-cd /app 
+systemctl restart mongod &>> $LOGFILE
 
-unzip -o /tmp/catalogue.zip &>> $LOGFILE
-
-VALIDATE $? "Unziping"
-
-npm install &>> $LOGFILE
-
-VALIDATE $? "Installing denpendancies"
-
-cp /home/centos/roboshop-shell/catalogue.serivce /etc/systemd/system/catalogue.service &>> $LOGFILE
-
-VALIDATE $? "coping catalogue service file"
-
-systemctl daemon-reload &>> $LOGFILE
-
-VALIDATE $? "catalogue deamon reload"
-
-systemctl enable catalogue &>> $LOGFILE
-
-VALIDATE $? "Enabling"
-
-systemctl start catalogue &>> $LOGFILE
-
-VALIDATE $? "Catalogue s"
-
-cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
-
-VALIDATE $? "Copy mongodb s"
-
-dnf install mongodb-org-shell -y &>> $LOGFILE
-
-VALIDATE $? "Installing mandogb client"
-
-mongo --host $MONGODB_HOST </app/schema/catalogue.js
-
-VALIDATE $? "Loading catalogue data into mongodb"
-
-
-
+VALIDATE $? "Restarting mongodb"  &>> $LOGFILE
