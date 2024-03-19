@@ -50,8 +50,6 @@ else
    echo -e "roboshop iser already exits $Y SKIPPING $N"
 fi
 
-VALIDATE $? "Roboshop user added"
-
 mkdir -p /app
 
 VALIDATE $? "Creating app directory"
@@ -70,8 +68,7 @@ npm install &>> $LOGFILE
 
 VALIDATE $? "Installing denpendancies"
 
-# 
-cp /home/centos/roboshop-shell/catalogue.serivce /etc/systemd/system/catalogue.service
+cp /home/centos/roboshop-shell/catalogue.serivce /etc/systemd/system/catalogue.service &>> $LOGFILE
 
 VALIDATE $? "coping catalogue servie file"
 
