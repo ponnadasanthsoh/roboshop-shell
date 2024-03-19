@@ -15,6 +15,7 @@ VALIDATE(){
     if [ $1 -ne 0 ]
     then
         echo -e "$2 ... $R FAILED $N"
+        exit 1
     else
         echo -e "$2 ... $G SUCCESS $N"
     fi
@@ -30,19 +31,19 @@ fi # fi means reverse of if, indicating condition end
 
 cp mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
 
-VALIDATE $? "Copied MongDB repo"
+VALIDATE $? "Copied MongDB repo" &>> $LOGFILE
 
 dnf install mongodb-org -y  &>> $LOGFILE
 
-VALIDATE $? "Installing mongodb"
+VALIDATE $? "Installing mongodb" &>> $LOGFILE
 
 systemctl enable mongod  &>> $LOGFILE
 
-VALIDATE $? "Enabling mongodb"
+VALIDATE $? "Enabling mongodb" &>> $LOGFILE
 
 systemctl start mongod &>> $LOGFILE
 
-VALIDATE $? "Starting mongodb"
+VALIDATE $? "Starting mongodb" &>> $LOGFILE
 
 sed -i 's/127.0.0.1/0.0.0.0/g'  /etc/mongod.conf &>> $LOGFILE
 
@@ -50,4 +51,4 @@ VALIDATE $? "Remort access to mongodb mongodb"
 
 systemctl restart mongod &>> $LOGFILE
 
-VALIDATE $? "Restarting mongodb"
+VALIDATE $? "Restarting mongodb"  &>> $LOGFILE
