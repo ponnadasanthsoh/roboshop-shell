@@ -68,33 +68,33 @@ npm install &>> $LOGFILE
 
 VALIDATE $? "Installing denpendancies"
 
-cp /home/centos/roboshop-shell/catalogue.serivce /etc/systemd/system/catalogue.service &>> $LOGFILE
+# use absolute, because catalogue.service exists there
+cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
 
-VALIDATE $? "coping catalogue servie file"
+VALIDATE $? "Copying catalogue service file"
 
 systemctl daemon-reload &>> $LOGFILE
 
-VALIDATE $? "catalogue deamon reload"
+VALIDATE $? "catalogue daemon reload"
 
 systemctl enable catalogue &>> $LOGFILE
 
-VALIDATE $? "Enabling"
+VALIDATE $? "Enable catalogue"
 
 systemctl start catalogue &>> $LOGFILE
 
-VALIDATE $? "Catalogue s"
+VALIDATE $? "Starting catalogue"
 
 cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
 
-VALIDATE $? "Copy mongodb s"
+VALIDATE $? "copying mongodb repo"
 
 dnf install mongodb-org-shell -y &>> $LOGFILE
 
-VALIDATE $? "Installing mandogb client"
+VALIDATE $? "Installing MongoDB client"
 
-mongo --host $MONGODB_HOST </app/schema/catalogue.js
+mongo --host $MONGDB_HOST </app/schema/catalogue.js &>> $LOGFILE
 
-VALIDATE $? "Loading catalogue data into mongodb"
-
+VALIDATE $? "Loading catalouge data into MongoDB"
 
 
