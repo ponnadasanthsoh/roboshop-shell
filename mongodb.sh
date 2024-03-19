@@ -5,6 +5,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+MONGODB_HOST=mongodb.pkljs.tech
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
@@ -29,26 +30,71 @@ else
     echo "You are root user"
 fi # fi means reverse of if, indicating condition end
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
+dnf module disable nodejs -y
 
-VALIDATE $? "Copied MongDB repo" &>> $LOGFILE
+VALIDATE $? "Disablling nodejs" 
 
-dnf install mongodb-org -y  &>> $LOGFILE
+dnf module enable nodejs:18 -y &>> $LOGFILE
 
-VALIDATE $? "Installing mongodb" &>> $LOGFILE
+VALIDATE $? "Enable nodejs 18" 
 
-systemctl enable mongod  &>> $LOGFILE
+dnf install nodejs -y &>> $LOGFILE
 
-VALIDATE $? "Enabling mongodb" &>> $LOGFILE
+VALIDATE $? "Installing nodejs 18"
+id roboshop
+if [ $? -ne 0 ]
+then
+   useradd roboshop
+   VALIDATE $? "Roboshop user creation"
+else
+   echo -e "roboshop iser already exits $Y SKIPPING $N"
+fi
 
-systemctl start mongod &>> $LOGFILE
+mkdir -p /app
 
-VALIDATE $? "Starting mongodb" &>> $LOGFILE
+VALIDATE $? "Creating app directory"
 
-sed -i 's/127.0.0.1/0.0.0.0/g'  /etc/mongod.conf &>> $LOGFILE
+curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>> $LOGFILE
 
-VALIDATE $? "Remort access to mongodb mongodb"
+VALIDATE $? "Downloading catalogue"
 
-systemctl restart mongod &>> $LOGFILE
+cd /app 
 
-VALIDATE $? "Restarting mongodb"  &>> $LOGFILE
+unzip -o /tmp/catalogue.zip &>> $LOGFILE
+
+VALIDATE $? "Unziping"
+
+npm install &>> $LOGFILE
+
+VALIDATE $? "Installing denpendancies"
+
+cp /home/centos/roboshop-shell/catalogue.serivce /etc/systemd/system/catalogue.service &>> $LOGFILE
+
+VALIDATE $? "coping catalogue service file"
+
+systemctl daemon-reload &>> $LOGFILE
+
+VALIDATE $? "catalogue deamon reload"
+
+systemctl enable catalogue &>> $LOGFILE
+
+VALIDATE $? "Enabling"
+
+systemctl start catalogue &>> $LOGFILE
+
+VALIDATE $? "Catalogue s"
+
+cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
+
+VALIDATE $? "Copy mongodb s"
+
+dnf install mongodb-org-shell -y &>> $LOGFILE
+
+VALIDATE $? "Installing mandogb client"
+
+mongo --host $MONGODB_HOST </app/schema/catalogue.js
+
+VALIDATE $? "Loading catalogue data into mongodb"
+
+
+
