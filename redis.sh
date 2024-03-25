@@ -37,13 +37,13 @@ VALIDATE $? "Installing redis realse"
 
 dnf module enable redis:remi-6.2 -y
 
-VALIDATE $? "Enable redis "
+VALIDATE $? "Enable redis"
 
 dnf install redis -y
 
 VALIDATE $? "Installing redis "
 
-sed -e 's/127.0.0.1/0.0.0.0/g' /etc/redis/redis.conf
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/redis/redis.conf
 
 VALIDATE $? "Allowing remote connection"
 
