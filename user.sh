@@ -69,7 +69,7 @@ npm install  &>> $LOGFILE
 
 VALIDATE $? "Installing dependencies"
 
-cp cp /home/centos/roboshop-shell/user.service /etc/systemd/system/user.service &>> $LOGFILE
+cp /home/centos/roboshop-shell/user.service /etc/systemd/system/user.service
 
 VALIDATE $? "Copying user service file"
 
@@ -83,7 +83,7 @@ VALIDATE $? "Enable user"
 
 systemctl start user &>> $LOGFILE
 
-VALIDATE $? "Starting user server"
+VALIDATE $? "Starting user"
 
 cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
 
@@ -93,6 +93,6 @@ dnf install mongodb-org-shell -y &>> $LOGFILE
 
 VALIDATE $? "Installing MongoDB client"
 
-mongo --host $MONGODB_HOST </app/schema/user.js &>> $LOGFILE
+mongo --host $MONGDB_HOST </app/schema/user.js &>> $LOGFILE
 
 VALIDATE $? "Loading user data into MongoDB"
