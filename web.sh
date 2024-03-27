@@ -5,7 +5,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
-MONGODB_HOST=mongodb.pkljs.tech
+MONGDB_HOST=mongodb.pkljs.tech
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
@@ -31,40 +31,40 @@ else
 fi # fi means reverse of if, indicating condition end
 
 dnf install nginx -y &>> $LOGFILE
-
+ 
 VALIDATE $? "Installing nginx"
 
 systemctl enable nginx &>> $LOGFILE
 
-VALIDATE $? "Enable nginx"
+VALIDATE $? "Enable nginx" 
 
 systemctl start nginx &>> $LOGFILE
 
-VALIDATE $? "starting nginx"
+VALIDATE $? "Starting Nginx"
 
 rm -rf /usr/share/nginx/html/* &>> $LOGFILE
 
-VALIDATE $? "Eemove old data from web"
+VALIDATE $? "removed default website"
 
 curl -o /tmp/web.zip https://roboshop-builds.s3.amazonaws.com/web.zip &>> $LOGFILE
 
-VALIDATE $? "Downloading we application"
+VALIDATE $? "Downloaded web application"
 
 cd /usr/share/nginx/html &>> $LOGFILE
 
-VALIDATE $? "Moving to nginx  html directory"
+VALIDATE $? "moving nginx html directory"
 
-unzip /tmp/web.zip &>> $LOGFILE
+unzip -o /tmp/web.zip &>> $LOGFILE
 
-VALIDATE $? "Unziping "
+VALIDATE $? "unzipping web"
+ 
+cp /home/centos/roboshop-shell/roboshop.conf /etc/nginx/default.d/roboshop.conf &>> $LOGFILE 
 
-cp /home/centos/roboshop-shell/roboshop.service /etc/nginx/default.d/roboshop.conf
-# cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
-VALIDATE $? "Copied robshop revers proxy config"
+VALIDATE $? "copied roboshop reverse proxy config"
 
-systemctl restart nginx 
+systemctl restart nginx &>> $LOGFILE
 
-VALIDATE $? "Restarted nginx"
+VALIDATE $? "restarted nginx"
 
 
 
